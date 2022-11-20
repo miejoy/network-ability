@@ -1,0 +1,23 @@
+{
+  "pins" : [
+    {
+      "identity" : "ability",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/miejoy/ability.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "11d66349eb423b873b15aa60dd839c5cde4c20fa"
+      }
+    },
+    {
+      "identity" : "auto-config",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/miejoy/auto-config.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "552f3c55583a36960c2716be6247844a3b65a0dc"
+      }
+    }
+  ],
+  "version" : 2
+}
