@@ -7,17 +7,20 @@
 //
 
 import Combine
+import Foundation
 
 extension Publisher {
-    /// 转化为 Future，暂时内部使用，注意：这里如果发布者没有传数据直接结束会存在泄漏
-    func asFuture() -> Future<Output, Failure> {
+    /// 转化为 Future
+    func asFuture() -> Future<Output, Error> {
         // 让 block 持有 cancellable
         var cancellable: AnyCancellable?
-        return Future<Output, Failure> { promise in
+        return Future<Output, Error> { promise in
             var didReceiveValue = false
             cancellable = self.sink { completion in
                 if case .failure(let error) = completion {
                     promise(.failure(error))
+                } else if (!didReceiveValue) {
+                    promise(.failure(URLError.init(.zeroByteResource)))
                 }
                 cancellable = nil
             } receiveValue: { value in
@@ -35,13 +38,15 @@ extension Publisher {
 }
 
 extension Future {
-    /// Future 添加完成回调，注意：这里如果发布者没有传数据直接结束会存在泄漏
+    /// Future 添加完成回调
     public func completion(with block: @escaping (Result<Output, Error>) -> Void) {
         var cancellable: AnyCancellable?
         var didReceiveValue = false
         cancellable = self.sink { completion in
             if case .failure(let error) = completion {
                 block(.failure(error))
+            } else if (!didReceiveValue) {
+                block(.failure(URLError.init(.zeroByteResource)))
             }
             cancellable = nil
         } receiveValue: { data in
