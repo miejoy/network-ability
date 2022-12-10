@@ -24,6 +24,10 @@ public struct NetworkHeaders: CustomStringConvertible, ExpressibleByDictionaryLi
     internal init(_ headers: [(String, String)] = []) {
         self.headers = headers
     }
+    
+    public init(dic: [String:String]) {
+        self.init(dic.map { ($0.key, $0.value) })
+    }
 
     public init(dictionaryLiteral elements: (String, String)...) {
         self.init(elements)
