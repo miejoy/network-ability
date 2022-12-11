@@ -10,8 +10,8 @@ import Foundation
 
 /// 网络交互头部信息
 public struct NetworkHeaders: CustomStringConvertible, ExpressibleByDictionaryLiteral {
-    @usableFromInline
-    internal var headers: [(String, String)]
+    
+    public var headers: [(String, String)]
 
     public var description: String {
         return self.headers.description
