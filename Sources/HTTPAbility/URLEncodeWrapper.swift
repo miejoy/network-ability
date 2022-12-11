@@ -65,6 +65,10 @@ public struct URLEncodeWrapper {
         }
     }
     
+    public func getParams() -> String? {
+        self.run()
+    }
+    
     /// URL 编码数据
     static func encodingUrlParams(params: [String:Any]) -> String? {
         var components: [(String, String)] = []
