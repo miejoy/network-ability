@@ -18,13 +18,13 @@ NetworkAbility 提供从网络获取资源能力。
 该模块提供如下通用网络能力：
 - NetworkAbility : 通用网络能力，继承该协议，需要实现对应请求网络资源方法
 - Ability.network : 读取当前网络能力，默认使用 DefaultHTTPDriver
-- RequestMethod : 请求方法，目前提供 GET 和 SET，对应 HTTP 的 GET 和 POST
+- RequestMethod : 请求方法，目前提供 get 和 set，对应 HTTP 的 get 和 post
 - NetworkHeaders : 网络请求或响应头部信息
 
 以及 HTTP 请求能力：
 - HTTPAbility : 最新资源能力协议，继承该协议，需要实现对应 HTTP 请求方法
 - Ability.http : 读取当前 HTTP 能力，默认使用 DefaultHTTPDriver
-- RequestMethod : HTTP 请求方法，目前提供 GET 和 POST，可通过 RequestMethod 转化过来
+- RequestMethod : HTTP 请求方法，目前提供 get 和 post，可通过 RequestMethod 转化过来
 - DefaultHTTPDriver : 默认 HTTP 请求驱动，继承 HTTPAbility
 - URLEncodeWrapper : URL 参数编码包装器，可以包装 Encodable 数据 或者 字典
 

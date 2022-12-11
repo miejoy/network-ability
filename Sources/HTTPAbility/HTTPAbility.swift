@@ -43,7 +43,7 @@ extension HTTPAbility {
     /// 发起无 body 的网络请求，获取可解码数据
     public func httpRequest<D:Decodable>(
         _ url: URL,
-        _ method: HTTPMethod = .GET,
+        _ method: HTTPMethod = .get,
         formData: URLEncodeWrapper? = nil,
         header: NetworkHeaders? = nil
     ) -> Future<D, Error> {
@@ -53,7 +53,7 @@ extension HTTPAbility {
     /// 发起无 body 的网络请求，获取字典数据
     public func httpRequest(
         _ url: URL,
-        method: HTTPMethod = .GET,
+        method: HTTPMethod = .get,
         formData: URLEncodeWrapper? = nil,
         header: NetworkHeaders? = nil
     ) -> Future<[String:Any], Error> {
@@ -63,7 +63,7 @@ extension HTTPAbility {
     /// 发起网络请求，获取可解码数据
     public func httpRequest<E:Encodable, D:Decodable>(
         _ url: URL,
-        _ method: HTTPMethod = .GET,
+        _ method: HTTPMethod = .get,
         formData: URLEncodeWrapper? = nil,
         body: E? = nil,
         header: NetworkHeaders? = nil
@@ -77,7 +77,7 @@ extension HTTPAbility {
     /// 发起网络请求，获取字典数据
     public func httpRequest<E:Encodable>(
         _ url: URL,
-        method: HTTPMethod = .GET,
+        method: HTTPMethod = .get,
         formData: URLEncodeWrapper? = nil,
         body: E? = nil,
         header: NetworkHeaders? = nil

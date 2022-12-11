@@ -10,7 +10,7 @@ import Foundation
 
 /// 请求方法
 public enum RequestMethod {
-    case GET
-    case SET
+    case get
+    case set
     case custom(String)
 }

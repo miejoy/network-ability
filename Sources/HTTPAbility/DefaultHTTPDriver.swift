@@ -75,7 +75,7 @@ public final class DefaultHTTPDriver: HTTPAbility {
     ) -> URLRequest? {
         var url = url
         var header = header ?? .init()
-        if method == .GET {
+        if method == .get {
             formData?.encode(into: &url)
         }
         
@@ -83,7 +83,7 @@ public final class DefaultHTTPDriver: HTTPAbility {
         var request = URLRequest(url: url)
         request.httpMethod = method.description
                 
-        if method != .GET {
+        if method != .get {
             if let body = body {
                 do {
                     let data = try requestEncoder.encode(body, headers: &header)

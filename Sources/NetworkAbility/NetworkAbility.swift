@@ -36,7 +36,7 @@ extension NetworkAbility {
     /// 发起无 body 的网络请求，获取可解码数据
     public func request<D:Decodable>(
         _ url: URL,
-        _ method: RequestMethod = .GET,
+        _ method: RequestMethod = .get,
         header: NetworkHeaders? = nil
     ) -> Future<D, Error> {
         request(url, method, body: Optional<Data>.none, header: header)
@@ -45,7 +45,7 @@ extension NetworkAbility {
     /// 发起无 body 的网络请求，获取字典数据
     public func request(
         _ url: URL,
-        method: RequestMethod = .GET,
+        method: RequestMethod = .get,
         header: NetworkHeaders? = nil
     ) -> Future<[String:Any], Error> {
         request(url, method: method, body: Optional<Data>.none, header: header)
@@ -54,7 +54,7 @@ extension NetworkAbility {
     /// 发起网络请求，获取可解码数据
     public func request<E:Encodable, D:Decodable>(
         _ url: URL,
-        _ method: RequestMethod = .GET,
+        _ method: RequestMethod = .get,
         body: E? = nil,
         header: NetworkHeaders? = nil
     ) -> Future<D, Error> {
@@ -67,7 +67,7 @@ extension NetworkAbility {
     /// 发起网络请求，获取字典数据
     public func request<E:Encodable>(
         _ url: URL,
-        method: RequestMethod = .GET,
+        method: RequestMethod = .get,
         body: E? = nil,
         header: NetworkHeaders? = nil
     ) -> Future<[String:Any], Error> {

@@ -10,16 +10,16 @@ import Foundation
 
 /// HTTP 请求方法
 public enum HTTPMethod: CustomStringConvertible, Equatable {
-    case GET
-    case POST
+    case get
+    case post
     case custom(String)
     
     public init(with method: RequestMethod) {
         switch method {
-        case .GET:
-            self = .GET
-        case .SET:
-            self = .POST
+        case .get:
+            self = .get
+        case .set:
+            self = .post
         case .custom(let string):
             self = .custom(string)
         }
@@ -27,9 +27,9 @@ public enum HTTPMethod: CustomStringConvertible, Equatable {
     
     public var description: String {
         switch self {
-        case .GET:
+        case .get:
             return "GET"
-        case .POST:
+        case .post:
             return "POST"
         case .custom(let string):
             return string

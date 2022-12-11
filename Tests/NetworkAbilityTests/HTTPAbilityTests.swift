@@ -165,7 +165,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<[String:Any], Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, method: .POST, body: EncodeDic(postData)).completion { (result) in
+        Ability.http.httpRequest(URL(string:urlString)!, method: .post, body: EncodeDic(postData)).completion { (result) in
             response = result
             expectation.fulfill()
         }
@@ -193,7 +193,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<[String:Any], Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, method: .POST, body: postData).completion { (result) in
+        Ability.http.httpRequest(URL(string:urlString)!, method: .post, body: postData).completion { (result) in
             response = result
             expectation.fulfill()
         }
@@ -216,7 +216,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<[String:Any], Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, method: .POST, header:[paramKey:paramValue]).completion { (result) in
+        Ability.http.httpRequest(URL(string:urlString)!, method: .post, header:[paramKey:paramValue]).completion { (result) in
             response = result
             expectation.fulfill()
         }
@@ -250,7 +250,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<ResponseObject, Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, .POST, body: EncodeDic(postData), header: nil).completion { (result:Result<ResponseObject, Error>) in
+        Ability.http.httpRequest(URL(string:urlString)!, .post, body: EncodeDic(postData), header: nil).completion { (result:Result<ResponseObject, Error>) in
             response = result
             expectation.fulfill()
         }
@@ -274,7 +274,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<[String:Any], Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, method: .POST, body: EncodeDic(postData), header: nil).completion { (result) in
+        Ability.http.httpRequest(URL(string:urlString)!, method: .post, body: EncodeDic(postData), header: nil).completion { (result) in
             response = result
             expectation.fulfill()
         }
@@ -299,7 +299,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<[String:Any], Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, method: .POST, formData: .dic(postData)).completion { (result) in
+        Ability.http.httpRequest(URL(string:urlString)!, method: .post, formData: .dic(postData)).completion { (result) in
             response = result
             expectation.fulfill()
         }
@@ -327,7 +327,7 @@ final class HTTPAbilityTests: XCTestCase {
         var response: Result<[String:Any], Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.http.httpRequest(URL(string:urlString)!, method: .POST, formData: .model(postData)).completion { (result) in
+        Ability.http.httpRequest(URL(string:urlString)!, method: .post, formData: .model(postData)).completion { (result) in
             response = result
             expectation.fulfill()
         }
