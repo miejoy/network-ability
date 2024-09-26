@@ -35,6 +35,29 @@ extension Publisher {
             }
         }
     }
+    
+    /// 完成一次，即结束回调
+    public func completionOnce(with block: @escaping (Result<Output, Error>) -> Void) {
+        var cancellable: AnyCancellable?
+        var didReceiveValue = false
+        cancellable = self.sink { completion in
+            if case .failure(let error) = completion {
+                block(.failure(error))
+            } else if (!didReceiveValue) {
+                block(.failure(URLError.init(.zeroByteResource)))
+            }
+            cancellable = nil
+        } receiveValue: { data in
+            block(.success(data))
+            didReceiveValue = true
+            cancellable?.cancel()
+        }
+        if didReceiveValue {
+            // 确保同步返回的场景不会出现内存泄漏
+            cancellable?.cancel()
+            cancellable = nil
+        }
+    }
 }
 
 extension Future {

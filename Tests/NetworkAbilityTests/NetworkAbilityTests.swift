@@ -84,7 +84,9 @@ final class NetworkAbilityTests: XCTestCase {
         var response: Result<ResponseObject, Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
-        Ability.network.request(URL(string:urlString)!, .set, body: EncodeDic(postData), header: nil).completion { (result:Result<ResponseObject, Error>) in
+        Ability.network.request(URL(string:urlString)!, .set, body: EncodeDic(postData), header: nil)
+            .map { $0 }
+            .completionOnce { (result:Result<ResponseObject, Error>) in
             response = result
             expectation.fulfill()
         }
