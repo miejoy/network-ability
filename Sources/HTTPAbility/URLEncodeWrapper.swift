@@ -12,16 +12,16 @@ import Ability
 /// URL参数 编码 包装器
 public struct URLEncodeWrapper {
     
-    var run : () -> String?
+    var run : () -> [(String, String)]
     
     public static func dic(_ dic:[String:Any]) -> Self {
-        self.init { () -> String? in
+        self.init { () -> [(String, String)] in
             return self.encodingUrlParams(params: dic)
         }
     }
     
     public static func model<T:Encodable>(_ model:T) -> Self {
-        self.init { () -> String? in
+        self.init { () -> [(String, String)] in
             var components: [(String, String)] = []
             // 使用镜像
             let mirror = Mirror(reflecting: model)
@@ -36,16 +36,14 @@ public struct URLEncodeWrapper {
                     }
                 }
             }
-            if components.isEmpty {
-                return nil
-            }
-            let str = components.map { "\($0)=\($1)" }.joined(separator: "&")
-            return str
+            return components
         }
     }
     
     public func encode(into url: inout URL) {
-        if let params = self.run() {
+        let components = self.run()
+        if !components.isEmpty {
+            let params = components.map { "\($0)=\($1)" }.joined(separator: "&")
             var urlStr = url.absoluteString
             if urlStr.contains("?") {
                 urlStr += ("&" + params)
@@ -59,30 +57,40 @@ public struct URLEncodeWrapper {
     }
     
     public func encode(into request: inout URLRequest) {
-        if let params = self.run() {
+        let components = self.run()
+        if !components.isEmpty {
+            let params = components.map { "\($0)=\($1)" }.joined(separator: "&")
             request.allHTTPHeaderFields?["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
             request.httpBody = params.data(using: .utf8)
         }
     }
     
     public func getParams() -> String? {
-        self.run()
+        let components = self.run()
+        if !components.isEmpty {
+            return components.map { "\($0)=\($1)" }.joined(separator: "&")
+        }
+        return nil
+    }
+    
+    func encode(into request: inout MultipartRequest) {
+        let components = self.run()
+        if !components.isEmpty {
+            components.forEach { item in
+                request.add(key: item.0, value: item.1)
+            }
+        }
     }
     
     /// URL 编码数据
-    static func encodingUrlParams(params: [String:Any]) -> String? {
+    static func encodingUrlParams(params: [String:Any]) -> [(String, String)] {
         var components: [(String, String)] = []
         
         for key in params.keys.sorted(by: <) {
             let value = params[key]!
             components += queryComponents(fromKey: key, value: value)
         }
-        
-        if components.isEmpty {
-            return nil
-        }
-        let str = components.map { "\($0)=\($1)" }.joined(separator: "&")
-        return str
+        return components
     }
     
     static func queryComponents(fromKey key: String, value: Any?) -> [(String, String)] {

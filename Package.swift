@@ -6,10 +6,10 @@ import PackageDescription
 let package = Package(
     name: "network-ability",
     platforms: [
-        .macOS(.v10_15),
-        .iOS(.v13),
-        .tvOS(.v13),
-        .watchOS(.v6),
+        .macOS(.v11),
+        .iOS(.v14),
+        .tvOS(.v14),
+        .watchOS(.v7),
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -34,6 +34,11 @@ let package = Package(
         ),
         .testTarget(
             name: "NetworkAbilityTests",
-            dependencies: ["NetworkAbility"]),
+            dependencies: ["NetworkAbility"],
+            resources: [
+                .process("test.txt"),
+                .process("test.zip")
+            ]
+        ),
     ]
 )

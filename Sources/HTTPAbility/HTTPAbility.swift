@@ -22,6 +22,15 @@ public protocol HTTPAbility: NetworkAbility {
         body: E?,
         header: NetworkHeaders?
     ) -> Future<(Data, NetworkHeaders), Error>
+    
+    func httpUpload(
+        url: URL,
+        files: [URL],
+        filesKey: String,
+        method: HTTPMethod,
+        formData: URLEncodeWrapper?,
+        header: NetworkHeaders?
+    ) async throws -> (data: Data, header: NetworkHeaders)
 }
 
 extension HTTPAbility {
@@ -90,6 +99,53 @@ extension HTTPAbility {
             }
         }
         .asFuture()
+    }
+    
+    /// 发起文件上传
+    func httpUpload<D:Decodable>(
+        _ url: URL,
+        files: [URL],
+        filesKey: String = "files",
+        method: HTTPMethod = .post,
+        formData: URLEncodeWrapper? = nil,
+        header: NetworkHeaders? =  nil
+    ) async throws -> (data: D, header: NetworkHeaders) {
+        let response = try await httpUpload(url: url, files: files, filesKey: filesKey, method: method, formData: formData, header: header)
+        return (try self.responseDecoder.decode(D.self, from: response.data, headers: response.header), response.header)
+    }
+    
+    /// 发起多文件上传
+    func httpUpload(
+        _ url: URL,
+        file: URL,
+        fileKey: String = "file",
+        method: HTTPMethod = .post,
+        formData: URLEncodeWrapper? = nil,
+        header: NetworkHeaders? =  nil
+    ) async throws -> (data: [String:Any], header: NetworkHeaders) {
+        let response = try await httpUpload(url: url, files: [file], filesKey: fileKey, method: method, formData: formData, header: header)
+        if let dic = try JSONSerialization.jsonObject(with: response.0, options: .fragmentsAllowed) as? [String:Any] {
+            return (dic, response.1)
+        } else {
+            throw URLError.init(.cannotDecodeRawData)
+        }
+    }
+    
+    /// 发起多文件上传
+    func httpUpload(
+        _ url: URL,
+        files: [URL],
+        filesKey: String = "files",
+        method: HTTPMethod = .post,
+        formData: URLEncodeWrapper? = nil,
+        header: NetworkHeaders? =  nil
+    ) async throws -> (data: [String:Any], header: NetworkHeaders) {
+        let response = try await httpUpload(url: url, files: files, filesKey: filesKey, method: method, formData: formData, header: header)
+        if let dic = try JSONSerialization.jsonObject(with: response.0, options: .fragmentsAllowed) as? [String:Any] {
+            return (dic, response.1)
+        } else {
+            throw URLError.init(.cannotDecodeRawData)
+        }
     }
 }
 

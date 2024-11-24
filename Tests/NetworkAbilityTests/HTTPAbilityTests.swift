@@ -342,6 +342,46 @@ final class HTTPAbilityTests: XCTestCase {
         
         XCTAssertEqual((value!["form"] as! [String:String])[paramKey], paramValue)
     }
+    
+    func testUploadFileRequest() async throws {
+        let urlString = host + "/anything"
+        // let urlString = "http://192.168.60.101:8082" + "/action/Upload.file"
+        let paramKey = "test"
+        let paramValue = "1"
+        let postData = [paramKey:paramValue]
+        let resourceBundle = Bundle.module
+        let fileUrl = resourceBundle.url(forResource: "test", withExtension: "txt")!
+        
+        let response = try await Ability.http.httpUpload(URL(string:urlString)!, file: fileUrl, formData: .dic(postData))
+        
+        let value = response.data
+        XCTAssertEqual((value["form"] as! [String:String])[paramKey], paramValue)
+        
+        let files = value["files"] as! [String:Any]
+        
+        XCTAssertEqual(files["file"] as! String, "Upload Test\n")
+    }
+    
+    func testUploadFilesRequest() async throws {
+        let urlString = host + "/anything"
+        // let urlString = "http://192.168.60.101:8082" + "/action/Upload.files"
+        let paramKey = "test"
+        let paramValue = "1"
+        let postData = [paramKey:paramValue]
+        let resourceBundle = Bundle.module
+        let fileUrl = resourceBundle.url(forResource: "test", withExtension: "txt")!
+        let zipFileUrl = resourceBundle.url(forResource: "test", withExtension: "zip")!
+        
+        let response = try await Ability.http.httpUpload(URL(string:urlString)!, files: [fileUrl, zipFileUrl], formData: .dic(postData))
+        
+        let value = response.data
+        XCTAssertEqual((value["form"] as! [String:String])[paramKey], paramValue)
+        
+        let files = value["files"] as! [String:Any]
+        
+        XCTAssertEqual(files["files[0]"] as! String, "Upload Test\n")
+        XCTAssertTrue((files["files[1]"] as! String).starts(with: "data:application/zip;base64,"))
+    }
 }
 
 struct EncodeDic: Encodable {

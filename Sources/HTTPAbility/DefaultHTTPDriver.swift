@@ -9,6 +9,7 @@
 import Foundation
 import Combine
 import AutoConfig
+import UniformTypeIdentifiers
 
 /// 默认 HTTP 能力驱动
 public final class DefaultHTTPDriver: HTTPAbility {
@@ -66,6 +67,38 @@ public final class DefaultHTTPDriver: HTTPAbility {
         }
     }
     
+    public func httpUpload(url: URL, files: [URL], filesKey: String, method: HTTPMethod, formData: URLEncodeWrapper?, header: NetworkHeaders?) async throws -> (data: Data, header: NetworkHeaders) {
+        guard var request = self.makeRequest(url: url, method: method, formData: .none, body: Optional<String>.none, header: header) else {
+            throw URLError(.badURL)
+        }
+        
+        var multipart = MultipartRequest()
+        formData?.encode(into: &multipart)
+        
+        if files.count == 1, let firstFile = files.first {
+            // 单个文件
+            let fileData = try Data(contentsOf: firstFile)
+            multipart.add(key: filesKey, fileName: firstFile.lastPathComponent, fileMimeType: firstFile.mimeType(), fileData: fileData)
+        } else {
+            // 多个个文件
+            try files.enumerated().forEach { (offset, fileUrl) in
+                let fileData = try Data(contentsOf: fileUrl)
+                multipart.add(key: filesKey + "[\(offset)]", fileName: fileUrl.lastPathComponent, fileMimeType: fileUrl.mimeType(), fileData: fileData)
+            }
+        }
+        request.setValue(multipart.httpContentTypeHeadeValue, forHTTPHeaderField: "Content-Type")
+        request.httpBody = multipart.httpBody
+        
+        let (data, respose) = try await URLSession.shared.data(for: request)
+        var headers = NetworkHeaders()
+        if self.needResponseHeader, let httpResponse = respose as? HTTPURLResponse {
+            for aHeader in httpResponse.allHeaderFields {
+                headers.add(name: "\(aHeader.key)", value: "\(aHeader.value)")
+            }
+        }
+        return (data, headers)
+    }
+    
     func makeRequest<E:Encodable>(
         url: URL,
         method: HTTPMethod,
@@ -103,5 +136,87 @@ public final class DefaultHTTPDriver: HTTPAbility {
         }
         
         return request
+    }
+}
+
+struct MultipartRequest {
+    
+    let boundary: String
+    
+    private let separator: String = "\r\n"
+    private var data: Data
+
+    init(boundary: String = UUID().uuidString) {
+        self.boundary = boundary
+        self.data = .init()
+    }
+    
+    private mutating func appendBoundarySeparator() {
+        data.append("--\(boundary)\(separator)")
+    }
+    
+    private mutating func appendSeparator() {
+        data.append(separator)
+    }
+
+    private func disposition(_ key: String) -> String {
+        "Content-Disposition: form-data; name=\"\(key)\""
+    }
+
+    mutating func add(
+        key: String,
+        value: String
+    ) {
+        appendBoundarySeparator()
+        data.append(disposition(key) + separator)
+        appendSeparator()
+        data.append(value + separator)
+    }
+
+    mutating func add(
+        key: String,
+        fileName: String,
+        fileMimeType: String,
+        fileData: Data
+    ) {
+        appendBoundarySeparator()
+        data.append(disposition(key) + "; filename=\"\(fileName)\"" + separator)
+        data.append("Content-Type: \(fileMimeType)" + separator + separator)
+        data.append(fileData)
+        appendSeparator()
+    }
+
+    var httpContentTypeHeadeValue: String {
+        "multipart/form-data; boundary=\(boundary)"
+    }
+
+    var httpBody: Data {
+        var bodyData = data
+        bodyData.append("--\(boundary)--")
+        return bodyData
+    }
+}
+
+extension Data {
+
+    mutating func append(
+        _ string: String,
+        encoding: String.Encoding = .utf8
+    ) {
+        guard let data = string.data(using: encoding) else {
+            return
+        }
+        append(data)
+    }
+}
+
+extension URL {
+    func mimeType() -> String {
+        if let mimeType = UTType(filenameExtension: self.pathExtension)?.preferredMIMEType {
+            return mimeType
+        }
+        else {
+            return "application/octet-stream"
+        }
     }
 }
