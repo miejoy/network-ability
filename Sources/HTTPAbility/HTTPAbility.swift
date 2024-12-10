@@ -102,7 +102,7 @@ extension HTTPAbility {
     }
     
     /// 发起文件上传
-    func httpUpload<D:Decodable>(
+    public func httpUpload<D:Decodable>(
         _ url: URL,
         files: [URL],
         filesKey: String = "files",
@@ -115,7 +115,7 @@ extension HTTPAbility {
     }
     
     /// 发起多文件上传
-    func httpUpload(
+    public func httpUpload(
         _ url: URL,
         file: URL,
         fileKey: String = "file",
@@ -132,7 +132,7 @@ extension HTTPAbility {
     }
     
     /// 发起多文件上传
-    func httpUpload(
+    public func httpUpload(
         _ url: URL,
         files: [URL],
         filesKey: String = "files",
