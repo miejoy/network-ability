@@ -6,7 +6,7 @@
       "location" : "https://github.com/miejoy/ability.git",
       "state" : {
         "branch" : "main",
-        "revision" : "11d66349eb423b873b15aa60dd839c5cde4c20fa"
+        "revision" : "b7ebc43cc7bebc3cd0d8bcaf97de6438f3f1caa2"
       }
     },
     {
@@ -15,7 +15,7 @@
       "location" : "https://github.com/miejoy/auto-config.git",
       "state" : {
         "branch" : "main",
-        "revision" : "552f3c55583a36960c2716be6247844a3b65a0dc"
+        "revision" : "8882b3d3f9ae8f5561a2cf29a49779697fe51879"
       }
     }
   ],

@@ -67,6 +67,14 @@ final class NetworkAbilityTests: XCTestCase {
         XCTAssertNil(response!.error)
     }
     
+    func testAsyncGetRequest() async throws {
+        let urlString = host + "/get?"
+        
+        let response: [String:Any] = try await Ability.network.request(URL(string:urlString)!)
+        
+        XCTAssert(!response.isEmpty)
+    }
+    
     func testPostRequestDecodeToObject() {
         
         struct ResponseObject : Decodable {
@@ -100,6 +108,25 @@ final class NetworkAbilityTests: XCTestCase {
         XCTAssertNotNil(value)
                 
         XCTAssertEqual(value!.json.test, paramValue)
+    }
+    
+    func testAsyncPostRequestDecodeToObject() async throws {
+        struct ResponseObject : Decodable {
+            
+            struct TestObject : Decodable {
+                var test : String
+            }
+            var json : TestObject
+        }
+        
+        let urlString = host + "/post"
+        let paramKey = "test"
+        let paramValue = "1"
+        let postData = [paramKey:paramValue]
+        
+        let response: ResponseObject = try await Ability.network.request(URL(string:urlString)!, .set, body: EncodeDic(postData), header: nil)
+        
+        XCTAssertEqual(response.json.test, paramValue)
     }
     
     func testPostRequest() {

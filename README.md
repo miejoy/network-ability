@@ -48,9 +48,8 @@ dependencies: [
 import NetworkAbility
 
 let url = URL(string: "")!
-Ability.network.request(url).completion { result in
-    print(result)
-}
+let response = try await Ability.network.request(url)
+print(response)
 
 ```
 
@@ -60,10 +59,8 @@ Ability.network.request(url).completion { result in
 import NetworkAbility
 
 let url = URL(string: "")!
-Ability.http.httpRequest(url).completion { result in
-    print(result)
-}
-
+let response = try await Ability.http.httpRequest(url)
+print(response)
 ```
 
 ### 能力注册

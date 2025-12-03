@@ -73,7 +73,16 @@ final class HTTPAbilityTests: XCTestCase {
         let value = response!.value
         
         XCTAssertEqual((value!["headers"] as! [String:String])[paramKey], paramValue)
+    }
+ 
+    func testAsyncGetRequestHeader() async throws {
+        let paramKey = "Test"
+        let paramValue = "1"
+        let urlString = host + "/get"
         
+        let response: [String:Any] = try await Ability.http.httpRequest(URL(string:urlString)!, header: [paramKey:paramValue])
+                
+        XCTAssertEqual((response["headers"] as! [String:String])[paramKey], paramValue)
     }
     
     func testGetJsonRequest() {
@@ -153,6 +162,24 @@ final class HTTPAbilityTests: XCTestCase {
         XCTAssertNotNil(value)
                 
         XCTAssertEqual(value!.args[paramKey], paramValue)
+    }
+    
+    func testAsyncGetRequestDecodeToObject() async throws {
+        struct ResponseObject: Decodable {
+            let args: [String:String]
+            let headers: [String: String]
+            let origin: String
+            let url: String
+        }
+        
+        let urlString = host + "/get"
+        let paramKey = "test"
+        let paramValue = "1"
+        let postData = [paramKey:paramValue]
+        
+        let response: ResponseObject = try await Ability.http.httpRequest(URL(string:urlString)!, formData: .dic(postData), header: nil)
+        
+        XCTAssertEqual(response.args[paramKey], paramValue)
     }
     
     

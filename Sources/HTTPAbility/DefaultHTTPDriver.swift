@@ -12,8 +12,7 @@ import AutoConfig
 import UniformTypeIdentifiers
 
 /// 默认 HTTP 能力驱动
-public final class DefaultHTTPDriver: HTTPAbility {
-    
+public final class DefaultHTTPDriver: HTTPAbility {    
     public var requestEncoder: NetworkRequestEncoder
     public var responseDecoder: NetworkResponseDecoder
     public var needResponseHeader: Bool
@@ -34,37 +33,24 @@ public final class DefaultHTTPDriver: HTTPAbility {
         formData: URLEncodeWrapper?,
         body: E?,
         header: NetworkHeaders?
-    ) -> Future<(Data, NetworkHeaders), Error> {
+    ) async throws -> (data: Data, headers: NetworkHeaders) {
         // 生成 Request
-        return Future<(Data, NetworkHeaders), Error>.init { promise in
-            guard let request = self.makeRequest(url: url, method: method, formData: formData, body: body, header: header) else {
-                promise(.failure(URLError(.badURL)))
-                return
-            }
-            
-            // 创建任务
-            let dataTask = URLSession.shared.dataTask(with: request) { (data, respose, error) in
-                if let error = error {
-                    promise(.failure(error))
-                    return
-                }
-                guard let data = data else {
-                    promise(.failure(URLError(.badServerResponse)))
-                    return
-                }
-                
-                var headers = NetworkHeaders()
-                if self.needResponseHeader, let httpResponse = respose as? HTTPURLResponse {
-                    for aHeader in httpResponse.allHeaderFields {
-                        headers.add(name: "\(aHeader.key)", value: "\(aHeader.value)")
-                    }
-                }
-                promise(.success((data, headers)))
-            }
-            
-            // 开始请求
-            dataTask.resume()
+        guard let request = self.makeRequest(url: url, method: method, formData: formData, body: body, header: header) else {
+            throw URLError(.badURL)
         }
+        
+        // 开始请求
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        // 整理数据
+        var headers = NetworkHeaders()
+        if self.needResponseHeader, let httpResponse = response as? HTTPURLResponse {
+            for aHeader in httpResponse.allHeaderFields {
+                headers.add(name: "\(aHeader.key)", value: "\(aHeader.value)")
+            }
+        }
+        
+        return (data, headers)
     }
     
     public func httpUpload(url: URL, files: [URL], filesKey: String, method: HTTPMethod, formData: URLEncodeWrapper?, header: NetworkHeaders?) async throws -> (data: Data, header: NetworkHeaders) {

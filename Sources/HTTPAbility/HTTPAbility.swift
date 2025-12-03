@@ -21,7 +21,7 @@ public protocol HTTPAbility: NetworkAbility {
         formData: URLEncodeWrapper?,
         body: E?,
         header: NetworkHeaders?
-    ) -> Future<(Data, NetworkHeaders), Error>
+    ) async throws -> (data: Data, headers: NetworkHeaders)
     
     func httpUpload(
         url: URL,
@@ -38,13 +38,32 @@ extension HTTPAbility {
 }
 
 extension HTTPAbility {
+    func httpRequest<E:Encodable>(
+        url: URL,
+        method: HTTPMethod,
+        formData: URLEncodeWrapper?,
+        body: E?,
+        header: NetworkHeaders?
+    ) -> Future<(Data, NetworkHeaders), Error> {
+        return Future<(Data, NetworkHeaders), Error>.init { promise in
+            Task {
+                do {
+                    let response = try await self.httpRequest(url: url, method: method, formData: formData, body: body, header: header)
+                    promise(.success(response))
+                } catch {
+                    promise(.failure(error))
+                }
+            }
+        }
+    }
+    
     public func request<E:Encodable>(
         url: URL,
         method: RequestMethod,
         body: E?,
         header: NetworkHeaders?
-    ) -> Future<(Data, NetworkHeaders), Error> {
-        httpRequest(url: url, method: .init(with: method), formData: nil, body: body, header: header)
+    ) async throws -> (data: Data, headers: NetworkHeaders) {
+        try await httpRequest(url: url, method: .init(with: method), formData: nil, body: body, header: header)
     }
 }
 
@@ -149,4 +168,52 @@ extension HTTPAbility {
     }
 }
 
-
+/// 添加 async 扩展方法
+extension HTTPAbility {
+    /// 发起无 body 的网络请求，获取可解码数据
+    public func httpRequest<D:Decodable>(
+        _ url: URL,
+        _ method: HTTPMethod = .get,
+        formData: URLEncodeWrapper? = nil,
+        header: NetworkHeaders? = nil
+    ) async throws -> D {
+        try await httpRequest(url, method, formData: formData, body: Optional<Data>.none, header: header)
+    }
+    
+    /// 发起无 body 的网络请求，获取字典数据
+    public func httpRequest(
+        _ url: URL,
+        method: HTTPMethod = .get,
+        formData: URLEncodeWrapper? = nil,
+        header: NetworkHeaders? = nil
+    ) async throws -> [String:Any] {
+        try await httpRequest(url, method: method, formData: formData, body: Optional<Data>.none, header: header)
+    }
+    
+    /// 发起网络请求，获取可解码数据
+    public func httpRequest<E:Encodable, D:Decodable>(
+        _ url: URL,
+        _ method: HTTPMethod = .get,
+        formData: URLEncodeWrapper? = nil,
+        body: E? = nil,
+        header: NetworkHeaders? = nil
+    ) async throws -> D {
+        let response = try await httpRequest(url: url, method: method, formData: formData, body: body, header: header)
+        return try self.responseDecoder.decode(D.self, from: response.data, headers: response.headers)
+    }
+    
+    /// 发起网络请求，获取字典数据
+    public func httpRequest<E:Encodable>(
+        _ url: URL,
+        method: HTTPMethod = .get,
+        formData: URLEncodeWrapper? = nil,
+        body: E? = nil,
+        header: NetworkHeaders? = nil
+    ) async throws -> [String:Any] {
+        let response = try await httpRequest(url: url, method: method, formData: formData, body: body, header: header)
+        guard let dic = try JSONSerialization.jsonObject(with: response.data, options: .fragmentsAllowed) as? [String:Any] else {
+            throw URLError.init(.cannotDecodeRawData)
+        }
+        return dic
+    }
+}
