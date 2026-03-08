@@ -10,17 +10,17 @@ import Foundation
 import Ability
 
 /// URL参数 编码 包装器
-public struct URLEncodeWrapper {
+public struct URLEncodeWrapper: @unchecked Sendable {
     
     var run : () -> [(String, String)]
     
     public static func dic(_ dic:[String:Any]) -> Self {
-        self.init { () -> [(String, String)] in
-            return self.encodingUrlParams(params: dic)
+        return self.init { () -> [(String, String)] in
+            return encodingUrlParams(params: dic)
         }
     }
     
-    public static func model<T:Encodable>(_ model:T) -> Self {
+    public static func model<T:Encodable & Sendable>(_ model:T) -> Self {
         self.init { () -> [(String, String)] in
             var components: [(String, String)] = []
             // 使用镜像
@@ -83,7 +83,7 @@ public struct URLEncodeWrapper {
     }
     
     /// URL 编码数据
-    static func encodingUrlParams(params: [String:Any]) -> [(String, String)] {
+    private static func encodingUrlParams(params: [String:Any]) -> [(String, String)] {
         var components: [(String, String)] = []
         
         for key in params.keys.sorted(by: <) {

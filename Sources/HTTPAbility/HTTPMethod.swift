@@ -9,7 +9,7 @@
 import Foundation
 
 /// HTTP 请求方法
-public enum HTTPMethod: CustomStringConvertible, Equatable {
+public enum HTTPMethod: CustomStringConvertible, Equatable, Sendable {
     case get
     case post
     case custom(String)

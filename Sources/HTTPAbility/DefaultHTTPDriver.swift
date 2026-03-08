@@ -13,9 +13,9 @@ import UniformTypeIdentifiers
 
 /// 默认 HTTP 能力驱动
 public final class DefaultHTTPDriver: HTTPAbility {    
-    public var requestEncoder: NetworkRequestEncoder
-    public var responseDecoder: NetworkResponseDecoder
-    public var needResponseHeader: Bool
+    public let requestEncoder: NetworkRequestEncoder
+    public let responseDecoder: NetworkResponseDecoder
+    public let needResponseHeader: Bool
     
     public init(
         requestEncoder: NetworkRequestEncoder = JSONEncoder(),

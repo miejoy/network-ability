@@ -9,7 +9,7 @@
 import Foundation
 
 /// 网络交互头部信息
-public struct NetworkHeaders: CustomStringConvertible, ExpressibleByDictionaryLiteral {
+public struct NetworkHeaders: CustomStringConvertible, ExpressibleByDictionaryLiteral, Sendable {
     
     public var headers: [(String, String)]
 

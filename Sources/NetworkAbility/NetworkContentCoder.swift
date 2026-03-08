@@ -10,12 +10,12 @@ import Foundation
 import Combine
 
 /// 网络请求编码器
-public protocol NetworkRequestEncoder {
+public protocol NetworkRequestEncoder: Sendable {
     func encode<E: Encodable>(_ encodable: E, headers: inout NetworkHeaders) throws -> Data
 }
 
 /// 网络响应解码器
-public protocol NetworkResponseDecoder {
+public protocol NetworkResponseDecoder: Sendable {
     func decode<D: Decodable>(_ decodable: D.Type, from data: Data, headers: NetworkHeaders) throws -> D
 }
 

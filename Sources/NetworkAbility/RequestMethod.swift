@@ -9,7 +9,7 @@
 import Foundation
 
 /// 请求方法
-public enum RequestMethod {
+public enum RequestMethod: Sendable {
     case get
     case set
     case custom(String)

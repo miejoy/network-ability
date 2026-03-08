@@ -38,7 +38,7 @@ extension HTTPAbility {
 }
 
 extension HTTPAbility {
-    func httpRequest<E:Encodable>(
+    func httpRequest<E:Encodable & Sendable>(
         url: URL,
         method: HTTPMethod,
         formData: URLEncodeWrapper?,
@@ -46,7 +46,8 @@ extension HTTPAbility {
         header: NetworkHeaders?
     ) -> Future<(Data, NetworkHeaders), Error> {
         return Future<(Data, NetworkHeaders), Error>.init { promise in
-            Task {
+            nonisolated(unsafe) let promise = promise
+            Task { @Sendable in
                 do {
                     let response = try await self.httpRequest(url: url, method: method, formData: formData, body: body, header: header)
                     promise(.success(response))
@@ -89,7 +90,7 @@ extension HTTPAbility {
     }
     
     /// 发起网络请求，获取可解码数据
-    public func httpRequest<E:Encodable, D:Decodable>(
+    public func httpRequest<E:Encodable & Sendable, D:Decodable>(
         _ url: URL,
         _ method: HTTPMethod = .get,
         formData: URLEncodeWrapper? = nil,
@@ -103,7 +104,7 @@ extension HTTPAbility {
     }
     
     /// 发起网络请求，获取字典数据
-    public func httpRequest<E:Encodable>(
+    public func httpRequest<E:Encodable & Sendable>(
         _ url: URL,
         method: HTTPMethod = .get,
         formData: URLEncodeWrapper? = nil,

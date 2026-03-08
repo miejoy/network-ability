@@ -11,6 +11,7 @@ import Ability
 import Combine
 @testable import NetworkAbility
 
+@MainActor
 final class HTTPAbilityTests: XCTestCase {
     let host = "https://httpbin.miejoy.com:4443"
     let timeout: TimeInterval = 10
@@ -411,10 +412,10 @@ final class HTTPAbilityTests: XCTestCase {
     }
 }
 
-struct EncodeDic: Encodable {
-    var dic: [String:Any]
+struct EncodeDic: Encodable & Sendable {
+    var dic: [String:Sendable]
     
-    init(_ dic: [String : Any]) {
+    init(_ dic: [String : Sendable]) {
         self.dic = dic
     }
     
@@ -434,10 +435,10 @@ struct EncodeDic: Encodable {
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: AnyCodingKey.self)
-        try dic.forEach { (key: String, value: Any) in
+        try dic.forEach { (key: String, value: Sendable) in
             if let data = value as? Codable {
                 try container.encode(data, forKey: .init(stringValue: key))
-            } else if let subDic = value as? [String:Any] {
+            } else if let subDic = value as? [String: Sendable] {
                 try container.encode(EncodeDic(subDic), forKey: .init(stringValue: key))
             } else if let arr = value as? [[String:Any]] {
                 try container.encode(arr.map(EncodeDic.init), forKey: .init(stringValue: key))

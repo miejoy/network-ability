@@ -5,13 +5,13 @@ NetworkAbility 提供从网络获取资源能力。
 [![Swift](https://github.com/miejoy/network-ability/actions/workflows/test.yml/badge.svg)](https://github.com/miejoy/network-ability/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/miejoy/network-ability/branch/main/graph/badge.svg)](https://codecov.io/gh/miejoy/network-ability)
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](LICENSE)
-[![Swift](https://img.shields.io/badge/swift-5.7-brightgreen.svg)](https://swift.org)
+[![Swift](https://img.shields.io/badge/swift-6.2-brightgreen.svg)](https://swift.org)
 
 ## 依赖
 
-- iOS 13.0+ / macOS 10.15+
-- Xcode 14.0+
-- Swift 5.7+
+- iOS 14.0+ / macOS 11+
+- Xcode 26.0+
+- Swift 6.2+
 
 ## 简介
 

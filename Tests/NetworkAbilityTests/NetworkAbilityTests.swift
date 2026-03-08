@@ -10,6 +10,7 @@ import XCTest
 import Ability
 @testable import NetworkAbility
 
+@MainActor
 final class NetworkAbilityTests: XCTestCase {
     let host = "https://httpbin.miejoy.com:4443"
     let timeout: TimeInterval = 10
@@ -77,9 +78,9 @@ final class NetworkAbilityTests: XCTestCase {
     
     func testPostRequestDecodeToObject() {
         
-        struct ResponseObject : Decodable {
+        struct ResponseObject : Decodable, Sendable {
             
-            struct TestObject : Decodable {
+            struct TestObject : Decodable, Sendable {
                 var test : String
             }
             var json : TestObject
@@ -89,12 +90,15 @@ final class NetworkAbilityTests: XCTestCase {
         let paramKey = "test"
         let paramValue = "1"
         let postData = [paramKey:paramValue]
-        var response: Result<ResponseObject, Error>? = nil
+        var response: Result<ResponseObject.TestObject, Error>? = nil
         let expectation = self.expectation(description: "The Post request should succeed")
         
         Ability.network.request(URL(string:urlString)!, .set, body: EncodeDic(postData), header: nil)
-            .map { $0 }
-            .completionOnce { (result:Result<ResponseObject, Error>) in
+            .receive(on: DispatchQueue.main)    // 这个很关键，Task 和 Futrue 不兼容，需要在主队列接收
+            .map { (response: ResponseObject) in
+                response.json
+            }
+            .completionOnce { (result:Result<ResponseObject.TestObject, Error>) in
             response = result
             expectation.fulfill()
         }
@@ -107,7 +111,7 @@ final class NetworkAbilityTests: XCTestCase {
         let value = response!.value
         XCTAssertNotNil(value)
                 
-        XCTAssertEqual(value!.json.test, paramValue)
+        XCTAssertEqual(value!.test, paramValue)
     }
     
     func testAsyncPostRequestDecodeToObject() async throws {

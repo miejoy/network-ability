@@ -14,7 +14,7 @@ import Combine
 public let networkAbilityName = AbilityName(NetworkAbility.self)
 
 /// 网络能力
-public protocol NetworkAbility: AbilityProtocol {
+public protocol NetworkAbility: AbilityProtocol, Sendable {
 
     /// 网络响应解码器
     var responseDecoder: NetworkResponseDecoder { get }
@@ -32,16 +32,17 @@ extension NetworkAbility {
     public static var abilityName: AbilityName { networkAbilityName }
 }
 
-extension NetworkAbility {
+extension NetworkAbility {    
     /// 发起请求方法
-    func request<E:Encodable>(
+    func request<E:Encodable & Sendable>(
         url: URL,
         method: RequestMethod,
         body: E?,
         header: NetworkHeaders?
     ) -> Future<(Data, NetworkHeaders), Error> {
         return Future<(Data, NetworkHeaders), Error>.init { promise in
-            Task {
+            nonisolated(unsafe) let promise = promise
+            Task { @Sendable in
                 do {
                     let response = try await self.request(url: url, method: method, body: body, header: header)
                     promise(.success(response))
@@ -72,7 +73,7 @@ extension NetworkAbility {
     }
     
     /// 发起网络请求，获取可解码数据
-    public func request<E:Encodable, D:Decodable>(
+    public func request<E:Encodable & Sendable, D:Decodable>(
         _ url: URL,
         _ method: RequestMethod = .get,
         body: E? = nil,
@@ -85,7 +86,7 @@ extension NetworkAbility {
     }
     
     /// 发起网络请求，获取字典数据
-    public func request<E:Encodable>(
+    public func request<E:Encodable & Sendable>(
         _ url: URL,
         method: RequestMethod = .get,
         body: E? = nil,

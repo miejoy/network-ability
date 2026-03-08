@@ -10,12 +10,12 @@ import Ability
 
 extension Ability {
     /// HTTP 请求能力
-    public static var network : NetworkAbility = {
+    public static let network : NetworkAbility = {
         Ability.getAbility(of: networkAbilityName) as? NetworkAbility ?? DefaultHTTPDriver()
     }()
     
     /// 通用网络能力
-    public static var http : HTTPAbility = {
+    public static let http : HTTPAbility = {
         Ability.getAbility(with: DefaultHTTPDriver()) as! HTTPAbility
     }()
 }
